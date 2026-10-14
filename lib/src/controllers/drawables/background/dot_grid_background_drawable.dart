@@ -30,11 +30,17 @@ class DotGridBackgroundDrawable extends BackgroundDrawable {
   void draw(Canvas canvas, Size size) {
     canvas.drawColor(backgroundColor, BlendMode.src);
 
-    final paint = Paint()..color = dotColor;
+    final points = <Offset>[];
     for (double y = 0; y <= size.height; y += spacing) {
       for (double x = 0; x <= size.width; x += spacing) {
-        canvas.drawCircle(Offset(x, y), dotRadius, paint);
+        points.add(Offset(x, y));
       }
     }
+
+    final paint = Paint()
+      ..color = dotColor
+      ..strokeWidth = dotRadius * 2
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPoints(PointMode.points, points, paint);
   }
 }
