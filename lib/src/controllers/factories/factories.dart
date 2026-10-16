@@ -1,4 +1,5 @@
 export 'free_style_factory.dart';
+export 'brush_free_style_factory.dart';
 export 'shape_factory.dart';
 export 'angle_factory.dart';
 export 'line_factory.dart';
