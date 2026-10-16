@@ -44,14 +44,11 @@ void main() {
       instance.paint(canvas, size);
 
       verify(() => canvas.save());
-      final storage = Matrix4.identity()
-          .scaledByDouble(
-            size.width / scale.width,
-            size.height / scale.height,
-            1,
-            1,
-          )
-          .storage;
+      final storage = Matrix4.diagonal3Values(
+        size.width / scale.width,
+        size.height / scale.height,
+        1,
+      ).storage;
       verify(() => canvas.transform(storage));
       verify(() => canvas.saveLayer(const Rect.fromLTWH(0, 0, 20, 20), any()));
       expect(verify(() => canvas.restore()).callCount, 2);

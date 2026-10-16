@@ -1101,10 +1101,14 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
       vertical ? (isReversed ? -1 : 1) * length / 2 : 0,
     );
 
-    final rotateOffset = Matrix4.identity()
-      ..rotateZ(initial.rotationAngle)
-      ..translateByDouble(offsetPosition.dx, offsetPosition.dy, 0, 1)
-      ..rotateZ(-initial.rotationAngle);
+    final rotateOffset =
+        (Matrix4.rotationZ(initial.rotationAngle) *
+              Matrix4.translationValues(
+                offsetPosition.dx,
+                offsetPosition.dy,
+                0,
+              ))
+          ..rotateZ(-initial.rotationAngle);
     final position = Offset(rotateOffset[12], rotateOffset[13]);
 
     final newDrawable = drawable.copyWith(

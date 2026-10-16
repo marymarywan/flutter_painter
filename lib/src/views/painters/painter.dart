@@ -34,14 +34,11 @@ class Painter extends CustomPainter {
     if (paintScale != null) {
       canvas.save();
       canvas.transform(
-        Matrix4.identity()
-            .scaledByDouble(
-              size.width / paintScale.width,
-              size.height / paintScale.height,
-              1,
-              1,
-            )
-            .storage,
+        Matrix4.diagonal3Values(
+          size.width / paintScale.width,
+          size.height / paintScale.height,
+          1,
+        ).storage,
       );
     }
 
