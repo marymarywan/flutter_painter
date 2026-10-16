@@ -27,6 +27,7 @@ part 'free_style_widget.dart';
 part 'text_widget.dart';
 part 'object_widget.dart';
 part 'shape_widget.dart';
+part 'brush_cursor_widget.dart';
 
 typedef DrawableCreatedCallback = void Function(Drawable drawable);
 
@@ -80,6 +81,12 @@ class FlutterPainter extends StatelessWidget {
   /// The incomplete [PathDrawable] is removed before this callback is called.
   final FreeStyleDrawingCallback? onFreeStyleDrawingCanceled;
 
+  /// Whether to show a circular cursor that follows the pointer while a
+  /// free-style drawing gesture is in progress, sized to the current
+  /// [FreeStyleSettings.strokeWidth] and colored according to the current
+  /// mode (the brush color while drawing, a neutral outline while erasing).
+  final bool showBrushCursor;
+
   /// The builder used to build this widget.
   ///
   /// Using the default constructor, it will default to returning the [_FlutterPainterWidget].
@@ -101,6 +108,7 @@ class FlutterPainter extends StatelessWidget {
     this.onFreeStyleDrawingUpdated,
     this.onFreeStyleDrawingEnded,
     this.onFreeStyleDrawingCanceled,
+    this.showBrushCursor = false,
   }) : _builder = _defaultBuilder;
 
   /// Creates a [FlutterPainter] with the given [controller], [builder] and optional callbacks.
@@ -120,6 +128,7 @@ class FlutterPainter extends StatelessWidget {
     this.onFreeStyleDrawingUpdated,
     this.onFreeStyleDrawingEnded,
     this.onFreeStyleDrawingCanceled,
+    this.showBrushCursor = false,
   }) : _builder = builder;
 
   @override
@@ -131,18 +140,33 @@ class FlutterPainter extends StatelessWidget {
         builder: (context, value, child) {
           return _builder(
             context,
-            _FlutterPainterWidget(
-              controller: controller,
-              onDrawableCreated: onDrawableCreated,
-              onDrawableDeleted: onDrawableDeleted,
-              onPainterSettingsChanged: onPainterSettingsChanged,
-              onSelectedObjectDrawableChanged: onSelectedObjectDrawableChanged,
-              onIsDrawingStateChanged: onIsDrawingStateChanged,
-              onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
-              onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
-              onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
-              onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
-            ),
+            showBrushCursor
+                ? _BrushCursorOverlay(
+                    controller: controller,
+                    onDrawableCreated: onDrawableCreated,
+                    onDrawableDeleted: onDrawableDeleted,
+                    onPainterSettingsChanged: onPainterSettingsChanged,
+                    onSelectedObjectDrawableChanged:
+                        onSelectedObjectDrawableChanged,
+                    onIsDrawingStateChanged: onIsDrawingStateChanged,
+                    onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
+                    onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
+                    onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
+                    onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
+                  )
+                : _FlutterPainterWidget(
+                    controller: controller,
+                    onDrawableCreated: onDrawableCreated,
+                    onDrawableDeleted: onDrawableDeleted,
+                    onPainterSettingsChanged: onPainterSettingsChanged,
+                    onSelectedObjectDrawableChanged:
+                        onSelectedObjectDrawableChanged,
+                    onIsDrawingStateChanged: onIsDrawingStateChanged,
+                    onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
+                    onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
+                    onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
+                    onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
+                  ),
           );
         },
       ),
