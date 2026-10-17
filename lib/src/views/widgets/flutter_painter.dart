@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ part 'text_widget.dart';
 part 'object_widget.dart';
 part 'shape_widget.dart';
 part 'brush_cursor_widget.dart';
+part 'infinite_dot_grid_widget.dart';
 
 typedef DrawableCreatedCallback = void Function(Drawable drawable);
 
@@ -87,6 +89,16 @@ class FlutterPainter extends StatelessWidget {
   /// mode (the brush color while drawing, a neutral outline while erasing).
   final bool showBrushCursor;
 
+  /// An optional dot grid to draw across the entire viewport, behind the
+  /// canvas, that tracks the current pan and zoom in real time instead of
+  /// being bounded to the canvas's own size.
+  ///
+  /// Unlike setting a [DotGridBackgroundDrawable] as the [controller]'s
+  /// `background`, this grid has no edges: it keeps covering the viewport no
+  /// matter how far the user pans, for a Miro/Figma-style infinite board.
+  /// Pass `null` (the default) for no infinite grid.
+  final DotGridBackgroundDrawable? infiniteDotGrid;
+
   /// The builder used to build this widget.
   ///
   /// Using the default constructor, it will default to returning the [_FlutterPainterWidget].
@@ -109,6 +121,7 @@ class FlutterPainter extends StatelessWidget {
     this.onFreeStyleDrawingEnded,
     this.onFreeStyleDrawingCanceled,
     this.showBrushCursor = false,
+    this.infiniteDotGrid,
   }) : _builder = _defaultBuilder;
 
   /// Creates a [FlutterPainter] with the given [controller], [builder] and optional callbacks.
@@ -129,6 +142,7 @@ class FlutterPainter extends StatelessWidget {
     this.onFreeStyleDrawingEnded,
     this.onFreeStyleDrawingCanceled,
     this.showBrushCursor = false,
+    this.infiniteDotGrid,
   }) : _builder = builder;
 
   @override
@@ -138,36 +152,46 @@ class FlutterPainter extends StatelessWidget {
       child: ValueListenableBuilder<PainterControllerValue>(
         valueListenable: controller,
         builder: (context, value, child) {
-          return _builder(
-            context,
-            showBrushCursor
-                ? _BrushCursorOverlay(
-                    controller: controller,
-                    onDrawableCreated: onDrawableCreated,
-                    onDrawableDeleted: onDrawableDeleted,
-                    onPainterSettingsChanged: onPainterSettingsChanged,
-                    onSelectedObjectDrawableChanged:
-                        onSelectedObjectDrawableChanged,
-                    onIsDrawingStateChanged: onIsDrawingStateChanged,
-                    onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
-                    onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
-                    onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
-                    onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
-                  )
-                : _FlutterPainterWidget(
-                    controller: controller,
-                    onDrawableCreated: onDrawableCreated,
-                    onDrawableDeleted: onDrawableDeleted,
-                    onPainterSettingsChanged: onPainterSettingsChanged,
-                    onSelectedObjectDrawableChanged:
-                        onSelectedObjectDrawableChanged,
-                    onIsDrawingStateChanged: onIsDrawingStateChanged,
-                    onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
-                    onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
-                    onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
-                    onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
-                  ),
-          );
+          Widget content = showBrushCursor
+              ? _BrushCursorOverlay(
+                  controller: controller,
+                  onDrawableCreated: onDrawableCreated,
+                  onDrawableDeleted: onDrawableDeleted,
+                  onPainterSettingsChanged: onPainterSettingsChanged,
+                  onSelectedObjectDrawableChanged:
+                      onSelectedObjectDrawableChanged,
+                  onIsDrawingStateChanged: onIsDrawingStateChanged,
+                  onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
+                  onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
+                  onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
+                  onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
+                )
+              : _FlutterPainterWidget(
+                  controller: controller,
+                  onDrawableCreated: onDrawableCreated,
+                  onDrawableDeleted: onDrawableDeleted,
+                  onPainterSettingsChanged: onPainterSettingsChanged,
+                  onSelectedObjectDrawableChanged:
+                      onSelectedObjectDrawableChanged,
+                  onIsDrawingStateChanged: onIsDrawingStateChanged,
+                  onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
+                  onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
+                  onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
+                  onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
+                );
+
+          final grid = infiniteDotGrid;
+          if (grid != null) {
+            content = Stack(
+              fit: StackFit.passthrough,
+              children: [
+                _InfiniteDotGridLayer(controller: controller, grid: grid),
+                content,
+              ],
+            );
+          }
+
+          return _builder(context, content);
         },
       ),
     );
