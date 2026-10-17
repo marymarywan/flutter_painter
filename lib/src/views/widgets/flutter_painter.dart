@@ -184,7 +184,7 @@ class FlutterPainter extends StatelessWidget {
           final grid = infiniteDotGrid;
           if (grid != null) {
             content = Stack(
-              fit: StackFit.passthrough,
+              fit: StackFit.expand,
               children: [
                 _InfiniteDotGridLayer(controller: controller, grid: grid),
                 content,

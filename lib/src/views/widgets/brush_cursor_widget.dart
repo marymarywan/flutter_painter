@@ -64,7 +64,7 @@ class _BrushCursorOverlayState extends State<_BrushCursorOverlay> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      fit: StackFit.passthrough,
+      fit: StackFit.expand,
       children: [
         _FlutterPainterWidget(
           controller: widget.controller,
@@ -79,29 +79,27 @@ class _BrushCursorOverlayState extends State<_BrushCursorOverlay> {
           onFreeStyleDrawingEnded: _handleEnded,
           onFreeStyleDrawingCanceled: _handleCanceled,
         ),
-        Positioned.fill(
-          child: IgnorePointer(
-            child: ValueListenableBuilder<Offset?>(
-              valueListenable: _cursor,
-              builder: (context, position, child) {
-                return ValueListenableBuilder<PainterControllerValue>(
-                  valueListenable: widget.controller,
-                  builder: (context, value, child) {
-                    final freeStyle = value.settings.freeStyle;
-                    return CustomPaint(
-                      painter: _BrushCursorPainter(
-                        position: position,
-                        diameter: freeStyle.strokeWidth,
-                        color: freeStyle.mode == FreeStyleMode.erase
-                            ? Colors.grey
-                            : freeStyle.color,
-                        filled: freeStyle.mode != FreeStyleMode.erase,
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+        IgnorePointer(
+          child: ValueListenableBuilder<Offset?>(
+            valueListenable: _cursor,
+            builder: (context, position, child) {
+              return ValueListenableBuilder<PainterControllerValue>(
+                valueListenable: widget.controller,
+                builder: (context, value, child) {
+                  final freeStyle = value.settings.freeStyle;
+                  return CustomPaint(
+                    painter: _BrushCursorPainter(
+                      position: position,
+                      diameter: freeStyle.strokeWidth,
+                      color: freeStyle.mode == FreeStyleMode.erase
+                          ? Colors.grey
+                          : freeStyle.color,
+                      filled: freeStyle.mode != FreeStyleMode.erase,
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
       ],

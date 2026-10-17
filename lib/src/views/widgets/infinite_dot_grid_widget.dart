@@ -12,15 +12,13 @@ class _InfiniteDotGridLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: IgnorePointer(
-        child: AnimatedBuilder(
-          animation: controller.transformationController,
-          builder: (context, child) => CustomPaint(
-            painter: _InfiniteDotGridPainter(
-              transform: controller.transformationController.value,
-              grid: grid,
-            ),
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: controller.transformationController,
+        builder: (context, child) => CustomPaint(
+          painter: _InfiniteDotGridPainter(
+            transform: controller.transformationController.value,
+            grid: grid,
           ),
         ),
       ),
