@@ -307,10 +307,9 @@ class _FlutterPainterWidget extends StatelessWidget {
                   builder: (context, constraints) => InteractiveViewer(
                     transformationController:
                         controller.transformationController,
-                    boundaryMargin: _boundaryMarginFor(
-                      constraints.biggest,
-                      minScale,
-                    ),
+                    boundaryMargin:
+                        controller.settings.scale.boundaryMargin ??
+                        _boundaryMarginFor(constraints.biggest, minScale),
                     minScale: minScale,
                     maxScale: maxScale,
                     panEnabled:
