@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../controllers/events/selected_object_drawable_removed_event.dart';
 import '../../controllers/helpers/renderer_check/renderer_check.dart';
 import '../../controllers/drawables/drawable.dart';
+import '../../controllers/drawables/background/dot_grid_background_drawable.dart';
 import '../../controllers/notifications/notifications.dart';
 import '../../controllers/drawables/sized1ddrawable.dart';
 import '../../controllers/drawables/shape/angle_drawable.dart';
