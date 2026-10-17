@@ -276,6 +276,15 @@ class _FlutterPainterWidget extends StatelessWidget {
                   ],
                 );
 
+                final canvasSize = value.settings.scale.canvasSize;
+                final sizedPainter = canvasSize != null
+                    ? SizedBox(
+                        width: canvasSize.width,
+                        height: canvasSize.height,
+                        child: painter,
+                      )
+                    : painter;
+
                 // InteractiveViewer always owns scale gestures, even when its
                 // pan and scale options are disabled. Temporarily replace it
                 // while an object is selected or a shape tool is active so the
@@ -285,7 +294,7 @@ class _FlutterPainterWidget extends StatelessWidget {
                   return ClipRect(
                     child: AnimatedBuilder(
                       animation: controller.transformationController,
-                      child: painter,
+                      child: sizedPainter,
                       builder: (context, child) => Transform(
                         transform: controller.transformationController.value,
                         alignment: Alignment.topLeft,
@@ -317,7 +326,7 @@ class _FlutterPainterWidget extends StatelessWidget {
                         (controller.freeStyleSettings.mode ==
                             FreeStyleMode.none),
                     scaleEnabled: scaleEnabled,
-                    child: painter,
+                    child: sizedPainter,
                   ),
                 );
               },
