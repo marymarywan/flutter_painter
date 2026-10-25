@@ -34,7 +34,6 @@ class _InfiniteDotGridPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // An unbounded size here would make the loops below spin forever.
     if (!size.width.isFinite || !size.height.isFinite) return;
 
     canvas.drawColor(grid.backgroundColor, BlendMode.src);

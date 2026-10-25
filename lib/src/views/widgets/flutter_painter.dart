@@ -185,7 +185,15 @@ class FlutterPainter extends StatelessWidget {
           if (grid != null) {
             content = Stack(
               children: [
-                _InfiniteDotGridLayer(controller: controller, grid: grid),
+                // [content] sizes the stack; the grid has no intrinsic size
+                // (a child-less CustomPaint collapses to zero), so it must be
+                // told to fill the stack explicitly.
+                Positioned.fill(
+                  child: _InfiniteDotGridLayer(
+                    controller: controller,
+                    grid: grid,
+                  ),
+                ),
                 content,
               ],
             );

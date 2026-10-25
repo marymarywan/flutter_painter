@@ -64,11 +64,11 @@ class BrushDrawableJsonAdapter implements DrawableJsonAdapter {
     blue: (data['blue'] as num).toDouble(),
   );
 
-  static Map<String, Object?> _encodeOffset(Offset offset) =>
-      <String, Object?>{'dx': offset.dx, 'dy': offset.dy};
+  static Map<String, Object?> _encodeOffset(Offset offset) => <String, Object?>{
+    'dx': offset.dx,
+    'dy': offset.dy,
+  };
 
-  static Offset _decodeOffset(Map<String, Object?> data) => Offset(
-    (data['dx'] as num).toDouble(),
-    (data['dy'] as num).toDouble(),
-  );
+  static Offset _decodeOffset(Map<String, Object?> data) =>
+      Offset((data['dx'] as num).toDouble(), (data['dy'] as num).toDouble());
 }

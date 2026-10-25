@@ -340,15 +340,23 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
         !_multitouch) {
       if (!_accepted) {
         final initialPosition = _initialPosition;
-        if (shouldYieldToMultitouch() &&
+        final withinMultitouchSlop =
+            shouldYieldToMultitouch() &&
             initialPosition != null &&
             (event.position - initialPosition).distance <=
-                computeHitSlop(event.kind, gestureSettings)) {
-          return;
+                computeHitSlop(event.kind, gestureSettings);
+        if (!withinMultitouchSlop) {
+          _accepted = true;
+          resolve(GestureDisposition.accepted);
         }
-        _accepted = true;
-        resolve(GestureDisposition.accepted);
       }
+      // Always forward the point, even while still inside the
+      // multitouch-yield slop window: only whether the *arena* is resolved
+      // yet is gated above, not whether this stroke records movement. If a
+      // second pointer arrives and wins the arena instead, onHorizontalDragCancel
+      // discards the whole in-progress drawable anyway, so recording early
+      // costs nothing — but skipping it leaves a visible gap at the start of
+      // every stroke.
       onHorizontalDragUpdate(event.position);
     } else if (event is PointerUpEvent) {
       if (event.pointer == _primaryPointer && _drawingActive && !_multitouch) {

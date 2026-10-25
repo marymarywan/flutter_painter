@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 
 import '../drawables/drawable.dart';
@@ -112,8 +113,13 @@ class DrawableJsonCodec {
   }
 
   /// Encodes [drawables] into a JSON string.
+  ///
+  /// Building the JSON-compatible document walks `ui.Image`/`Paint` objects
+  /// that cannot cross isolates, so that part stays on the calling isolate;
+  /// only the final (often large) string serialization runs via [compute].
   Future<String> encodeJson(Iterable<Drawable> drawables) async {
-    return jsonEncode(await encode(drawables));
+    final document = await encode(drawables);
+    return compute(jsonEncode, document);
   }
 
   /// Decodes a document produced by [encode].
@@ -152,8 +158,13 @@ class DrawableJsonCodec {
   }
 
   /// Decodes a JSON [source] produced by [encodeJson].
-  Future<List<Drawable>> decodeJson(String source) {
-    return decode(jsonDecode(source));
+  ///
+  /// Parsing the (often large) JSON string runs via [compute]; rebuilding
+  /// `ui.Image`/`Paint` objects from the resulting document stays on the
+  /// calling isolate, since those can't cross isolates.
+  Future<List<Drawable>> decodeJson(String source) async {
+    final document = await compute(jsonDecode, source);
+    return decode(document);
   }
 
   Future<Map<String, Object?>> _encodeDrawable(
